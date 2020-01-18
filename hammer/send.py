@@ -21,6 +21,7 @@ import sys, time, random, json
 from threading import Thread
 from queue import Queue
 from pprint import pprint
+from subprocess import Popen, DEVNULL
 
 # pypi:
 import requests # pip3 install requests
@@ -641,7 +642,7 @@ def sendmany(contract):
             
             
     elif sys.argv[2]=="threaded2":
-        num_workers = 100
+        num_workers = 25
         if len(sys.argv)==4:
             try:
                 num_workers = int(sys.argv[3])
@@ -670,7 +671,7 @@ def sendmany(contract):
 
 if __name__ == '__main__':
     
-    check_CLI_or_syntax_info_and_exit()
+    # check_CLI_or_syntax_info_and_exit()
 
     global w3, NODENAME, NODETYPE, NODEVERSION, CONSENSUS, NETWORKID, CHAINNAME, CHAINID
     w3, chainInfos = web3connection(RPCaddress=RPCaddress, account=None)
@@ -682,9 +683,9 @@ if __name__ == '__main__':
     # try_contract_set_via_RPC(contract);  exit()
 
     w3.eth.defaultAccount = w3.eth.accounts[0] # set first account as sender
-    contract = initialize_fromAddress()
+    # contract = initialize_fromAddress()
 
-    txs = sendmany(contract)
+    # txs = sendmany(contract)
     sys.stdout.flush() # so that the log files are updated.
 
     success = controlSample_transactionsSuccessful(txs)
