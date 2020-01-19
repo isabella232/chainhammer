@@ -250,7 +250,7 @@ def many_transactions_threaded(contract, numTx):
     
     return txs
 
-def many_transactions_threaded_Queue(contract, numTx, num_worker_threads=25):
+def many_transactions_threaded_Queue(contract, numTx, num_worker_threads):
     """
     submit many transactions multi-threaded, 
     with size limited threading Queue
