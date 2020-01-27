@@ -71,12 +71,14 @@ echo
 
 cd hammer
 rm -f $INFOFILE
+#  Taking out last info file
+rm -f last-experiment.json
 
-# title is_up.py
-# echo Loops until the node is answering on the expected port.
-# ./is_up.py
-# echo Great, node is available now.
-# echo 
+title is_up.py
+echo Loops until the node is answering on the expected port.
+./is_up.py
+echo Great, node is available now.
+echo 
 
 title tps.py
 echo start listener tps.py, show here but also log into file $TPSLOG
@@ -84,35 +86,15 @@ echo this ENDS after send.py below writes a new INFOFILE $INFOFILE
 unbuffer ./tps.py | tee "../$TPSLOG" &
 echo
 
-# title sleep 1.5 seconds
-# echo to have tps.py say its thing before deploy.py starts printing
-# echo
-# sleep 1.5
-# echo 
 
-# title deploy.py
-# echo Deploy the smartContract, deploy.py will then trigger tps.py to START counting. 
-# echo Logging into file $DEPLOYLOG.
-# echo 
-# ./deploy.py > "../$DEPLOYLOG"
-# sleep 0
-# echo
-
-# title send.py
-# echo Send $CH_TXS transactions with non/concurrency algo \'$CH_THREADING\', plus possibly wait 10 more blocks.
+title send 
+# echo Send Transactions through Jmeter and wait 10 more blocks.
 # echo Then send.py triggers tps.py to end counting. Logging all into file $SENDLOG. 
 # echo
 
 # ./send.py $CH_TXS $CH_THREADING > "../$SENDLOG"
+./send-jmeter.py  > "../$SENDLOG"
 
-title jmeter
-echo Send Transactions through Jmeter and wait 10 more blocks.
-echo Then send.py triggers tps.py to end counting. Logging all into file $SENDLOG. 
-echo
-
-# ./send.py $CH_TXS $CH_THREADING > "../$SENDLOG"
-/.jmeter.sh > /dev/null 2>&1
-touch $INFOFILE
 
 echo
 
@@ -123,22 +105,22 @@ sleep 2
 echo
 
 
-title blocksDB_create.py
-echo read blocks from node1 into SQL db
-cd ../reader
-./blocksDB_create.py $DBFILE ../$INFOFILE
-echo
+# title blocksDB_create.py
+# echo read blocks from node1 into SQL db
+# cd ../reader
+# ./blocksDB_create.py $DBFILE ../$INFOFILE
+# echo
 
-title blocksDB_diagramming.py
-echo make time series diagrams from SQL db
-./blocksDB_diagramming.py $DBFILE $INFOWORD ../$INFOFILE
-echo 
+# title blocksDB_diagramming.py
+# echo make time series diagrams from SQL db
+# ./blocksDB_diagramming.py $DBFILE $INFOWORD ../$INFOFILE
+# echo 
 
-title page_generator.py
-./page_generator.py ../$INFOFILE ../$TPSLOG
-echo 
+# title page_generator.py
+# ./page_generator.py ../$INFOFILE ../$TPSLOG
+# echo 
 
-cd ..
+# cd ..
 
 # switch off the trap already here, because sometimes the 2nd kill in networks/$2-stop.sh is not needed anymore:
 set +e
@@ -158,6 +140,7 @@ fi
 
 title "Ready."
 echo See that image, and those .md and .html pages.
+echo Experiemnt done.
 echo
 
 
