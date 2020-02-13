@@ -221,10 +221,8 @@ def measurement(blockNumber, pauseBetweenQueries=0.3,
         if AUTOSTOP_TPS and sendingEndedFiledate()!=whenBefore:
             print ("Received signal from send.py = updated INFOFILE.")
             block_last = readInfofile()['send']['block_last']
-
-            ## This is a hack look to ficing this 
-            # block_last = w3.eth.blockNumber
-            finalTpsAv = tpsAv[block_last]
+            
+            # finalTpsAv = tpsAv[block_last]
             finalTpsAv = getNearestEntry(myDict=tpsAv, myIndex=block_last)
             
             break
@@ -274,15 +272,12 @@ if __name__ == '__main__':
 
     peakTpsAv, finalTpsAv, start_epochtime = measurement( blocknumber_start_here )
 
-    print(peakTpsAv,fina)
+    print(peakTpsAv,finalTpsAv)
 
-    # p = Popen(["./jmeter.sh"], stdout=DEVNULL)
-    # p.wait()
-    # p = Popen(["touch last-experiment.json"], stdout=DEVNULL)
-    # print ("Jmeter is done")
+
     
-    # addMeasurementToFile(peakTpsAv, finalTpsAv, start_epochtime, FILE_LAST_EXPERIMENT)
-    # print ("Updated info file:", FILE_LAST_EXPERIMENT, "THE END.")
+    addMeasurementToFile(peakTpsAv, finalTpsAv, start_epochtime, FILE_LAST_EXPERIMENT)
+    print ("Updated info file:", FILE_LAST_EXPERIMENT, "THE END.")
    
     
     

@@ -1,20 +1,19 @@
 #!/usr/bin/env python3
-# standard library:
-
 
 
 # extend path for imports:
 if __name__ == '__main__' and __package__ is None:
     from os import sys, path
     sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
-    
-import sys, time, random, json
+
+# standard library:
+import sys, time, random, json, os , re, subprocess
 from threading import Thread
 from queue import Queue
 from pprint import pprint
-from subprocess import DEVNULL, STDOUT, check_call
+
 import subprocess
-import os
+from urllib.parse import urlparse
 
 # pypi:
 import requests # pip3 install requests
@@ -31,33 +30,21 @@ from hammer.config import FILE_LAST_EXPERIMENT, EMPTY_BLOCKS_AT_END
 from hammer.clienttools import web3connection, unlockAccount
 
 
-# check_call([cmd, arg1, arg2], stdout=DEVNULL, stderr=STDOUT)
-# block_from = w3.eth.blockNumber
-# rpc =  RPCaddress
-# account = w3.eth.accounts[0]
-
 def send_transactions(rpc , account):
     with open(os.devnull, 'w') as fp:
-        cmd = subprocess.Popen(("./jmeter.sh", rpc, account), stdout=fp)
+        cmd = subprocess.Popen(["./jmeter.sh", rpc, account], stdout=fp)
+        cmd.wait()
         block_to = w3.eth.blockNumber
-        return block_to
+
+    empty_blocks = EMPTY_BLOCKS_AT_END
+    success = True
+    filename=FILE_LAST_EXPERIMENT
     
-
-
-def store_experiment_data(success, num_txs, 
-                          block_from, block_to, 
-                          empty_blocks,
-                          filename=FILE_LAST_EXPERIMENT):
-    """
-    most basic data about this last experiment, 
-    stored in same (overwritten) file.
-    Purpose: diagramming should be able to calc proper averages & select ranges
-    """
     data = {"send" : {
                 "block_first" : block_from,
                 "block_last": block_to,
                 "empty_blocks": empty_blocks, 
-                "num_txs" : num_txs,
+                "num_txs" : 10000,
                 "sample_txs_successful": success
                 },
             "node" : {
@@ -72,10 +59,10 @@ def store_experiment_data(success, num_txs,
                 "chain_id" : CHAINID
                 }
             }
+        
             
     with open(filename, "w") as f:
         json.dump(data, f)
-
 
 if __name__ == '__main__':
     
@@ -87,7 +74,11 @@ if __name__ == '__main__':
 
 
     block_from = w3.eth.blockNumber
-    rpc =  RPCaddress
-    account = w3.eth.accounts[0]
-    
-    send_transactions(rpc , account)
+    print(block_from)
+    # rpc =  RPCaddress[7:]
+    rpc = urlparse(RPCaddress)
+    account = w3.eth.accounts[0]    
+    send_transactions(str(rpc.hostname) , account)
+    # print(block_from, block_to)
+
+    # store_experiment_data
