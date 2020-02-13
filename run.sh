@@ -88,12 +88,11 @@ echo
 
 
 title send 
-# echo Send Transactions through Jmeter and wait 10 more blocks.
-# echo Then send.py triggers tps.py to end counting. Logging all into file $SENDLOG. 
-# echo
+echo Send Transactions through Jmeter and wait 10 more blocks.
+echo Then send_jmeter.py triggers tps.py to end counting. Logging all into file $SENDLOG. 
 
-# ./send.py $CH_TXS $CH_THREADING > "../$SENDLOG"
-./send-jmeter.py  > "../$SENDLOG"
+
+./send_jmeter.py  > "../$SENDLOG"
 
 
 echo
@@ -105,22 +104,8 @@ sleep 2
 echo
 
 
-# title blocksDB_create.py
-# echo read blocks from node1 into SQL db
-# cd ../reader
-# ./blocksDB_create.py $DBFILE ../$INFOFILE
-# echo
 
-# title blocksDB_diagramming.py
-# echo make time series diagrams from SQL db
-# ./blocksDB_diagramming.py $DBFILE $INFOWORD ../$INFOFILE
-# echo 
-
-# title page_generator.py
-# ./page_generator.py ../$INFOFILE ../$TPSLOG
-# echo 
-
-# cd ..
+cd ..
 
 # switch off the trap already here, because sometimes the 2nd kill in networks/$2-stop.sh is not needed anymore:
 set +e
@@ -129,17 +114,13 @@ trap '' EXIT
 if (( $# == 2 )); then
     title stop network
     source networks/$2-stop.sh
-    # sleep 0
-    # echo should be stopped now
-    # scripts/netstat_port8545.sh
+ 
     echo
-    # TODO: Perhaps each time also call networks/$2-clean.sh 
-    #       to reset chain to block 0 ???
-    #       or at least docker-compose down already in -stop.sh?
+
 fi
 
 title "Ready."
-echo See that image, and those .md and .html pages.
+# echo See that image, and those .md and .html pages.
 echo Experiemnt done.
 echo
 
