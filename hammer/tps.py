@@ -13,6 +13,7 @@
 
 
 import time, timeit, sys, os, json
+from subprocess import Popen, DEVNULL
 
 from web3 import Web3, HTTPProvider
 
@@ -263,11 +264,17 @@ if __name__ == '__main__':
     blockNumber_before = w3.eth.blockNumber
     print ("\nBlock ",blockNumber_before," - waiting for something to happen") 
     
-    loopUntil_NewContract()
+    # loopUntil_NewContract()
     blocknumber_start_here = w3.eth.blockNumber 
     print ("\nblocknumber_start_here =", blocknumber_start_here)
     
+   
+
     peakTpsAv, finalTpsAv, start_epochtime = measurement( blocknumber_start_here )
+
+    print(peakTpsAv,finalTpsAv)
+
+
     
     addMeasurementToFile(peakTpsAv, finalTpsAv, start_epochtime, FILE_LAST_EXPERIMENT)
     print ("Updated info file:", FILE_LAST_EXPERIMENT, "THE END.")

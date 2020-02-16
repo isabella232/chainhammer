@@ -5,22 +5,22 @@ TPSLOG=logs/tps.py.log
 DEPLOYLOG=logs/deploy.py.log
 SENDLOG=logs/send.py.log
 
-if [ -z "$CH_TXS" ] || [ -z "$CH_THREADING" ]; then 
-    echo "You must set 2 ENV variables, examples:"
-    echo "export CH_TXS=1000 CH_THREADING=sequential"
-    echo "export CH_TXS=5000 CH_THREADING=\"threaded2 20\""
-    exit
-fi
+# if [ -z "$CH_TXS" ] || [ -z "$CH_THREADING" ]; then 
+#     echo "You must set 2 ENV variables, examples:"
+#     echo "export CH_TXS=1000 CH_THREADING=sequential"
+#     echo "export CH_TXS=5000 CH_THREADING=\"threaded2 20\""
+#     exit
+# fi
 
-if (( $# != 1  && $# != 2 )); then
-    echo "Syntax:"
-    echo "./run.sh info-word [network-scripts-prefix]"
-    echo "e.g."
-    echo "./run.sh Geth-t2.xlarge"
-    echo "./run.sh Geth-t2.xlarge geth-clique"
-    echo "The first case assumes that network nodes are started manually."
-    exit    
-fi
+# if (( $# != 1  && $# != 2 )); then
+#     echo "Syntax:"
+#     echo "./run.sh info-word [network-scripts-prefix]"
+#     echo "e.g."
+#     echo "./run.sh Geth-t2.xlarge"
+#     echo "./run.sh Geth-t2.xlarge geth-clique"
+#     echo "The first case assumes that network nodes are started manually."
+#     exit    
+# fi
 
 INFOWORD=$1
 
@@ -71,6 +71,8 @@ echo
 
 cd hammer
 rm -f $INFOFILE
+#  Taking out last info file
+rm -f last-experiment.json
 
 title is_up.py
 echo Loops until the node is answering on the expected port.
@@ -84,26 +86,14 @@ echo this ENDS after send.py below writes a new INFOFILE $INFOFILE
 unbuffer ./tps.py | tee "../$TPSLOG" &
 echo
 
-title sleep 1.5 seconds
-echo to have tps.py say its thing before deploy.py starts printing
-echo
-sleep 1.5
-echo 
 
-title deploy.py
-echo Deploy the smartContract, deploy.py will then trigger tps.py to START counting. 
-echo Logging into file $DEPLOYLOG.
-echo 
-./deploy.py > "../$DEPLOYLOG"
-sleep 0
-echo
+title send 
+echo Send Transactions through Jmeter and wait 10 more blocks.
+echo Then send_jmeter.py triggers tps.py to end counting. Logging all into file $SENDLOG. 
 
-title send.py
-echo Send $CH_TXS transactions with non/concurrency algo \'$CH_THREADING\', plus possibly wait 10 more blocks.
-echo Then send.py triggers tps.py to end counting. Logging all into file $SENDLOG. 
-echo
 
-./send.py $CH_TXS $CH_THREADING > "../$SENDLOG"
+./send_jmeter.py  > "../$SENDLOG"
+
 
 echo
 
@@ -114,20 +104,6 @@ sleep 2
 echo
 
 
-title blocksDB_create.py
-echo read blocks from node1 into SQL db
-cd ../reader
-./blocksDB_create.py $DBFILE ../$INFOFILE
-echo
-
-title blocksDB_diagramming.py
-echo make time series diagrams from SQL db
-./blocksDB_diagramming.py $DBFILE $INFOWORD ../$INFOFILE
-echo 
-
-title page_generator.py
-./page_generator.py ../$INFOFILE ../$TPSLOG
-echo 
 
 cd ..
 
@@ -138,17 +114,14 @@ trap '' EXIT
 if (( $# == 2 )); then
     title stop network
     source networks/$2-stop.sh
-    # sleep 0
-    # echo should be stopped now
-    # scripts/netstat_port8545.sh
+ 
     echo
-    # TODO: Perhaps each time also call networks/$2-clean.sh 
-    #       to reset chain to block 0 ???
-    #       or at least docker-compose down already in -stop.sh?
+
 fi
 
 title "Ready."
-echo See that image, and those .md and .html pages.
+# echo See that image, and those .md and .html pages.
+echo Experiemnt done.
 echo
 
 
